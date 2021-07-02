@@ -3,17 +3,21 @@ import React, { useState } from 'react';
 import './App.css';
 
 import { deck, shuffle } from './utility';
-interface Cards {
+interface Card {
   suit: string;
   rank: string;
   priority: number;
   points: number;
 }
 interface Players {
-  north: Array<Cards>;
-  west: Array<Cards>;
-  east: Array<Cards>;
-  south: Array<Cards>;
+  north: Array<Card>;
+  west: Array<Card>;
+  east: Array<Card>;
+  south: Array<Card>;
+}
+interface PlayingHand {
+  playerId: string;
+  card: Card;
 }
 
 const initialPlayer: Players = {
@@ -22,10 +26,16 @@ const initialPlayer: Players = {
   east: [],
   south: [],
 };
+const initialPlayingHand: Array<PlayingHand> = [];
 
 const App: React.FC = () => {
   const [mainDeck, setMainDeck] = useState(shuffle(deck));
   const [playerDeck, setPlayerDeck] = useState(initialPlayer);
+  const [playingHand, setPlayingHand] = useState(initialPlayingHand);
+
+  function playCard(card: Card, playerId: string) {
+    console.log(playerId + ':', card.suit, card.rank);
+  }
 
   const renderMaindCards = mainDeck.map(card => {
     return (
@@ -35,10 +45,14 @@ const App: React.FC = () => {
       </div>
     );
   });
-  const renderPlayerCards = (cards: Array<Cards>) =>
+  const renderPlayerCards = (cards: Array<Card>, playerId: string) =>
     cards.map(card => {
       return (
-        <div key={`${card.suit}${card.rank}`} className="card">
+        <div
+          key={`${card.suit}${card.rank}`}
+          className="card"
+          onClick={() => playCard(card, playerId)}
+        >
           <div className={`suit-${card.suit}`}>{card.suit}</div>
           <div className="rank">{card.rank}</div>
         </div>
@@ -64,12 +78,12 @@ const App: React.FC = () => {
       <div className="north-west"></div>
       <div className="north">
         <div className="player-tag">North</div>
-        {renderPlayerCards(playerDeck.north)}
+        {renderPlayerCards(playerDeck.north, 'north')}
       </div>
       <div className="north-east"></div>
-      <div className="east">
-        <div className="player-tag">East</div>
-        {renderPlayerCards(playerDeck.east)}
+      <div className="west">
+        <div className="player-tag">West</div>
+        {renderPlayerCards(playerDeck.west, 'west')}
       </div>
       <div className="middle">
         <div className="mid-card-container">{renderMaindCards}</div>
@@ -84,14 +98,14 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
-      <div className="west">
-        <div className="player-tag">West</div>
-        {renderPlayerCards(playerDeck.west)}
+      <div className="east">
+        <div className="player-tag">East</div>
+        {renderPlayerCards(playerDeck.east, 'east')}
       </div>
-      <div className="south-west"></div>
+      <div className="south-east"></div>
       <div className="south">
         <div className="player-tag">South</div>
-        {renderPlayerCards(playerDeck.south)}
+        {renderPlayerCards(playerDeck.south, 'south')}
       </div>
       <div className="south-east"></div>
     </div>

@@ -1,38 +1,129 @@
 .App {
-  text-align: center;
+  display: grid;
+  height: 100vh;
+  grid-template-columns: repeat(24, 1fr);
+  grid-template-rows: repeat(24, 1fr) ;
+}
+.north, .south {
+  grid-column: span 14 / auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  padding: 1rem;
+}
+.north-west, .north-east{
+  grid-row: span 5 / auto;
+  grid-column: span 5 / auto;
+}
+.south-west, .south-east{
+  grid-column: span 5 / auto;
+  grid-row: span 6 / auto;
+}
+.north{
+  grid-row: span 5 / auto;
+}
+.south{
+  grid-row: span 6 / auto;
+  padding-top: 2.5rem;
+}
+.east, .west {
+  grid-row: span 13 / auto;
+  grid-column: span 5 / auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  padding: 1rem;
+
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.middle {
+  grid-column: span 14 / auto;
+  grid-row: span 13 / auto;
+  display: grid;
+  grid-template-rows: repeat(12, 1fr) ;
+  padding: 1.5rem;
+  border-radius: 0.4rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 10px 10px 30px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.card{
+  min-height: 3rem;
+  min-width: 2rem;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  border-radius: 0.2em;
+  cursor: pointer;
+  transition: all 0.08s;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-content: center;
+  justify-items: center;
+  border: rgb(255, 255, 255, 0) solid .01em;
+}
+.card:hover {
+  border: rgb(58, 76, 158) solid .01em;
+  border-bottom: rgb(255, 20, 20) solid .01em;
+  margin: 0.2rem;
+  min-width: 2.6rem;
+}
+.player-tag {
+  width: 100%;
+  font-weight: 800;
+  padding: 0.3rem;
+  align-self: flex-start;
+}
+.suit-♥ {
+  font-size: 1.8rem;
+  color: red;
+}
+.suit-♠ {
+  font-size: 1.8rem;
+  color: black;
+}
+.suit-♦ {
+  font-size: 1.8rem;
+  color: red;
+}
+.suit-♣ {
+  font-size: 1.8rem;
+  color: black;
+}
+.rank {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.mid-card-container{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-start;
+  grid-row: span 10 / auto;
+}
+.button-container {
+  width: 100%;
+  align-self: flex-end;
+  grid-row: span 2 / auto;
+}
+.primary-button {
+  cursor: pointer;
+  padding: .5rem 1rem;
+  margin:.5rem;
+  min-width: 5rem;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  background: none;
+  border: none;
+  border-radius: .3rem;
+  border: rgb(0,0,0,0) solid .01em;
+}
+.primary-button:hover{
+  border: rgb(58, 76, 158) solid .01em;
+  border-bottom: rgb(255, 20, 20) solid .01em;
 }
 
-.App-link {
-  color: #61dafb;
-}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+
+
+

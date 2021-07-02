@@ -75,16 +75,21 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
+      {/* North West Container */}
       <div className="north-west"></div>
+      {/* North Container */}
       <div className="north">
         <div className="player-tag">North</div>
         {renderPlayerCards(playerDeck.north, 'north')}
       </div>
+      {/* North East Container */}
       <div className="north-east"></div>
+      {/* West Container */}
       <div className="west">
         <div className="player-tag">West</div>
         {renderPlayerCards(playerDeck.west, 'west')}
       </div>
+      {/* Middle Container */}
       <div className="middle">
         <div className="mid-card-container">{renderMaindCards}</div>
         <div className="button-container">
@@ -98,15 +103,19 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
+      {/* East Container */}
       <div className="east">
         <div className="player-tag">East</div>
         {renderPlayerCards(playerDeck.east, 'east')}
       </div>
-      <div className="south-east"></div>
+      {/* South West Container */}
+      <div className="south-west"></div>
+      {/* South Container */}
       <div className="south">
         <div className="player-tag">South</div>
         {renderPlayerCards(playerDeck.south, 'south')}
       </div>
+      {/* South East Container */}
       <div className="south-east"></div>
     </div>
   );

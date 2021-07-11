@@ -1,9 +1,4 @@
-interface Card {
-  suit: string;
-  rank: string;
-  priority: number;
-  points: number;
-}
+import { Card } from './../interface';
 
 export const deck: Array<Card> = [
   {

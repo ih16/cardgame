@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
-
+import React, { useState, FC } from 'react';
+import { Card, Players, PlayingHand } from './interface';
 import './App.css';
+import {
+  StyledCard,
+  Layout,
+  Grid,
+  PlayerTag,
+  PrimaryButton,
+} from './components/styled';
 
 import { deck, shuffle } from './utility';
-interface Card {
-  suit: string;
-  rank: string;
-  priority: number;
-  points: number;
-}
-interface Players {
-  north: Array<Card>;
-  west: Array<Card>;
-  east: Array<Card>;
-  south: Array<Card>;
-}
-interface PlayingHand {
-  playerId: string;
-  card: Card;
-}
+import Modal from './components/Modal';
+import CardOnBoard from './components/CardOnBoard';
+import { DevTool } from './components/DevTool';
 
 const initialPlayer: Players = {
   north: [],
@@ -26,38 +20,66 @@ const initialPlayer: Players = {
   east: [],
   south: [],
 };
-const initialPlayingHand: Array<PlayingHand> = [];
+const initialPlayingHand: PlayingHand = {
+  north: undefined,
+  west: undefined,
+  east: undefined,
+  south: undefined,
+};
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [mainDeck, setMainDeck] = useState(shuffle(deck));
   const [playerDeck, setPlayerDeck] = useState(initialPlayer);
   const [playingHand, setPlayingHand] = useState(initialPlayingHand);
+  const [currentPlayer, setCurrentPlayer] = useState<keyof Players>('south');
+  const [currentSuit, setCurrentSuit] = useState<string | undefined>();
+  const [trump, setTrump] = useState<string | undefined>();
+  const [showModal, setShowModal] = useState(false);
 
-  function playCard(card: Card, playerId: string) {
-    console.log(playerId + ':', card.suit, card.rank);
+  function playCard(card: Card, playerId: keyof Players) {
+    if (!playingHand[playerId] && currentPlayer === playerId) {
+      console.log(playerId + ':', card.suit, card.rank);
+      if (!currentSuit) setCurrentSuit(card.suit);
+      const haveSuit = playerDeck[playerId].find(
+        card => card.suit === currentSuit,
+      );
+      if (currentSuit === card.suit || !haveSuit) {
+        setPlayingHand({ ...playingHand, [playerId]: card });
+        setPlayerDeck({
+          ...playerDeck,
+          [playerId]: [...playerDeck[playerId].filter(ele => ele !== card)],
+        });
+        if (playerId === 'south') setCurrentPlayer('east');
+        if (playerId === 'east') setCurrentPlayer('north');
+        if (playerId === 'north') setCurrentPlayer('west');
+        if (playerId === 'west') setCurrentPlayer('south');
+      }
+    }
   }
 
   const renderMaindCards = mainDeck.map(card => {
     return (
-      <div key={`${card.suit}${card.rank}`} className="card">
-        <div className={`suit-${card.suit}`}>{card.suit}</div>
+      <StyledCard key={`${card.suit}${card.rank}`} suit={card.suit}>
+        <div className="suit">{card.suit}</div>
         <div className="rank">{card.rank}</div>
-      </div>
+      </StyledCard>
     );
   });
-  const renderPlayerCards = (cards: Array<Card>, playerId: string) =>
+
+  const renderPlayerCards = (cards: Array<Card>, playerId: keyof Players) =>
     cards.map(card => {
       return (
-        <div
+        <StyledCard
           key={`${card.suit}${card.rank}`}
-          className="card"
+          suit={card.suit}
           onClick={() => playCard(card, playerId)}
         >
-          <div className={`suit-${card.suit}`}>{card.suit}</div>
+          <div className="suit">{card.suit}</div>
           <div className="rank">{card.rank}</div>
-        </div>
+        </StyledCard>
       );
     });
+
   function dealCards() {
     setPlayerDeck({
       ...playerDeck,
@@ -70,53 +92,59 @@ const App: React.FC = () => {
   }
   function resetCards() {
     setPlayerDeck(initialPlayer);
+    setCurrentPlayer('south');
+    setCurrentSuit(undefined);
+    setPlayingHand(initialPlayingHand);
     setMainDeck(shuffle(deck));
   }
 
   return (
-    <div className="App">
-      {/* North West Container */}
-      <div className="north-west"></div>
-      {/* North Container */}
-      <div className="north">
-        <div className="player-tag">North</div>
-        {renderPlayerCards(playerDeck.north, 'north')}
-      </div>
-      {/* North East Container */}
-      <div className="north-east"></div>
-      {/* West Container */}
-      <div className="west">
-        <div className="player-tag">West</div>
-        {renderPlayerCards(playerDeck.west, 'west')}
-      </div>
-      {/* Middle Container */}
-      <div className="middle">
-        <div className="mid-card-container">{renderMaindCards}</div>
-        <div className="button-container">
-          <button className="primary-button" onClick={resetCards}>
-            Shuffle
-          </button>
+    <div>
+      <Modal showModal={showModal} setShowModal={setShowModal}>
+        <DevTool trump={trump} setTrump={setTrump} />
+      </Modal>
+      <Layout>
+        <Grid isPlaying={currentPlayer === 'north'}>
+          {/* NORTH */}
+          <PlayerTag className="align-right">North</PlayerTag>
+          {renderPlayerCards(playerDeck.north, 'north')}
+        </Grid>
+
+        <Grid isPlaying={currentPlayer === 'west'}>
+          {/* WEST */}
+          <PlayerTag>West</PlayerTag>
+          {renderPlayerCards(playerDeck.west, 'west')}
+        </Grid>
+        <Grid>
+          {/* MIDDLE */}
           {!!mainDeck.length && (
-            <button className="primary-button" onClick={dealCards}>
-              Deal
-            </button>
+            <div className="mid-card-container">{renderMaindCards}</div>
           )}
-        </div>
-      </div>
-      {/* East Container */}
-      <div className="east">
-        <div className="player-tag">East</div>
-        {renderPlayerCards(playerDeck.east, 'east')}
-      </div>
-      {/* South West Container */}
-      <div className="south-west"></div>
-      {/* South Container */}
-      <div className="south">
-        <div className="player-tag">South</div>
-        {renderPlayerCards(playerDeck.south, 'south')}
-      </div>
-      {/* South East Container */}
-      <div className="south-east"></div>
+          {!mainDeck.length && <CardOnBoard playingHand={playingHand} />}
+          <div className="button-container">
+            <PrimaryButton onClick={resetCards}>Shuffle</PrimaryButton>
+            {!!mainDeck.length && (
+              <PrimaryButton className="primary-button" onClick={dealCards}>
+                Deal
+              </PrimaryButton>
+            )}
+            <PrimaryButton onClick={() => setShowModal(true)}>
+              Dev Tool
+            </PrimaryButton>
+          </div>
+        </Grid>
+        <Grid isPlaying={currentPlayer === 'east'}>
+          {/* EAST */}
+          <PlayerTag className="align-right">East</PlayerTag>
+          {renderPlayerCards(playerDeck.east, 'east')}
+        </Grid>
+
+        <Grid isPlaying={currentPlayer === 'south'}>
+          {/* SOUTH */}
+          <PlayerTag>South</PlayerTag>
+          {renderPlayerCards(playerDeck.south, 'south')}
+        </Grid>
+      </Layout>
     </div>
   );
 };

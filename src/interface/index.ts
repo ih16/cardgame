@@ -16,3 +16,7 @@ export interface PlayingHand {
   east: Card | undefined;
   south: Card | undefined;
 }
+export interface Score {
+  ns: number;
+  we: number;
+}

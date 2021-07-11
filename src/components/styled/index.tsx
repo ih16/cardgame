@@ -198,3 +198,32 @@ export const PlayingCardGrid = styled.div`
     margin-top: -2rem;
   }
 `;
+
+export const ScoreCard = styled.div`
+  position: fixed;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5rem;
+  z-index: 9999;
+  top: 0.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  padding: 0.8rem;
+  border-radius: 0.3rem;
+  background-color: white;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  & .ns {
+    color: rgb(255, 20, 20);
+  }
+  & .we {
+    color: rgb(58, 76, 158);
+  }
+  &:hover {
+    font-size: 1rem;
+  }
+`;

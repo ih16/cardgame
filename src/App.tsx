@@ -1,5 +1,5 @@
-import React, { useState, FC } from 'react';
-import { Card, Players, PlayingHand } from './interface';
+import React, { useState, FC, useEffect } from 'react';
+import { Card, Players, PlayingHand, Score } from './interface';
 import './App.css';
 import {
   StyledCard,
@@ -7,6 +7,7 @@ import {
   Grid,
   PlayerTag,
   PrimaryButton,
+  ScoreCard,
 } from './components/styled';
 
 import { deck, shuffle } from './utility';
@@ -31,14 +32,16 @@ const App: FC = () => {
   const [mainDeck, setMainDeck] = useState(shuffle(deck));
   const [playerDeck, setPlayerDeck] = useState(initialPlayer);
   const [playingHand, setPlayingHand] = useState(initialPlayingHand);
-  const [currentPlayer, setCurrentPlayer] = useState<keyof Players>('south');
+  const [currentPlayer, setCurrentPlayer] = useState<keyof Players | string>(
+    'south',
+  );
   const [currentSuit, setCurrentSuit] = useState<string | undefined>();
   const [trump, setTrump] = useState<string | undefined>();
   const [showModal, setShowModal] = useState(false);
+  const [score, setScore] = useState<Score>({ ns: 0, we: 0 });
 
   function playCard(card: Card, playerId: keyof Players) {
     if (!playingHand[playerId] && currentPlayer === playerId) {
-      console.log(playerId + ':', card.suit, card.rank);
       if (!currentSuit) setCurrentSuit(card.suit);
       const haveSuit = playerDeck[playerId].find(
         card => card.suit === currentSuit,
@@ -56,6 +59,41 @@ const App: FC = () => {
       }
     }
   }
+
+  useEffect(() => {
+    //mutate cards
+    const playingHandArr: Array<Card> = [];
+    let totalPoints = 0;
+    if (
+      playingHand.east &&
+      playingHand.north &&
+      playingHand.west &&
+      playingHand.south
+    ) {
+      Object.entries(playingHand).forEach(([key, value]) => {
+        if (trump === value.suit)
+          value = { ...value, priority: value.priority + 8 };
+        playingHandArr.push(value);
+        playingHandArr.sort((a, b) => b.priority - a.priority);
+        totalPoints += value.points;
+      });
+
+      Object.entries(playingHand).forEach(([key, value]) => {
+        if (
+          value.suit === playingHandArr[0].suit &&
+          value.rank === playingHandArr[0].rank
+        ) {
+          if (key === 'north' || key === 'south')
+            setScore({ ...score, ns: score.ns + totalPoints });
+          if (key === 'west' || key === 'east')
+            setScore({ ...score, we: score.we + totalPoints });
+          setCurrentPlayer(key);
+          setPlayingHand(initialPlayingHand);
+          setCurrentSuit(undefined);
+        }
+      });
+    }
+  }, [playingHand]);
 
   const renderMaindCards = mainDeck.map(card => {
     return (
@@ -96,10 +134,15 @@ const App: FC = () => {
     setCurrentSuit(undefined);
     setPlayingHand(initialPlayingHand);
     setMainDeck(shuffle(deck));
+    setScore({ ns: 0, we: 0 });
   }
 
   return (
     <div>
+      <ScoreCard>
+        <div className="ns">NS {score.ns}</div>
+        <div className="we">WE {score.we}</div>
+      </ScoreCard>
       <Modal showModal={showModal} setShowModal={setShowModal}>
         <DevTool trump={trump} setTrump={setTrump} />
       </Modal>
